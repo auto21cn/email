@@ -5,7 +5,7 @@ An easy way to send emails with attachments in Go
 # Install
 
 ```bash
-go get github.com/scorredoira/email
+go get github.com/auto21cn/email
 ```
 
 # Usage
@@ -18,7 +18,7 @@ import (
 	"net/mail"
 	"net/smtp"
 
-	"github.com/scorredoira/email"
+	"github.com/auto21cn/email"
 )
 
 func Example() {

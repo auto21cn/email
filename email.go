@@ -5,8 +5,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime"
+	"mime/multipart"
 	"net/mail"
 	"net/smtp"
 	"path/filepath"
@@ -64,6 +66,21 @@ func (m *Message) AttachBuffer(filename string, buf []byte, inline bool) error {
 // Attach attaches a file.
 func (m *Message) Attach(file string) error {
 	return m.attach(file, false)
+}
+
+// AttachFile attaches a file.
+func (m *Message) AttachFile(file multipart.File, filename string, inline bool) error {
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file); err != nil {
+		return err
+	}
+	m.Attachments[filename] = &Attachment{
+		Filename: filename,
+		Data:     buf.Bytes(),
+		Inline:   inline,
+	}
+
+	return nil
 }
 
 // Inline includes a file as an inline attachment.
@@ -187,5 +204,5 @@ func (m *Message) Bytes() []byte {
 
 // Send sends the message.
 func Send(addr string, auth smtp.Auth, m *Message) error {
-	return smtp.SendMail(addr, auth, m.From.Address, m.Tolist(), m.Bytes())
+	return SendMail(addr, auth, m.From.Address, m.Tolist(), m.Bytes())
 }
